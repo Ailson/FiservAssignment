@@ -10,7 +10,7 @@ A native iOS mobile banking application that displays user accounts and transact
   - Account nickname (falls back to account number if nickname is null)
   - Account type (text representation with appropriate icon)
   - Balance (formatted with currency)
-- Pull-to-refresh support (Comming Soon)
+- Pull-to-refresh support
 - Visual indication for favorite accounts (star icon)
 - Error handling with retry option
 

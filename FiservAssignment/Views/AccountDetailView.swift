@@ -16,38 +16,9 @@ struct AccountDetailView: View {
     var body: some View {
         ZStack {
             if viewModel.isLoading {
-                VStack(spacing: 16) {
-                    ProgressView()
-                        .scaleEffect(1.5)
-                    Text("Loading account details...")
-                        .font(.headline)
-                        .foregroundColor(.secondary)
-                }
+                loadingView
             } else if let error = viewModel.errorMessage {
-                VStack(spacing: 20) {
-                    Image(systemName: "exclamationmark.triangle")
-                        .font(.system(size: 50))
-                        .foregroundColor(.orange)
-                    
-                    Text("Oops! Something went wrong")
-                        .font(.headline)
-                    
-                    Text(error)
-                        .font(.body)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal)
-                    
-                    Button("Try Again") {
-                        didLoad = false
-                        Task {
-                            await viewModel.fetchAccountDetail(accountId: account.id, baseAccount: account)
-                            didLoad = true
-                        }
-                    }
-                    .buttonStyle(.borderedProminent)
-                }
-                .padding()
+                errorView(error: <#T##String#>)
             } else if let detail = viewModel.accountDetail {
                 ScrollView {
                     VStack(spacing: 16) {
@@ -101,6 +72,46 @@ struct AccountDetailView: View {
                 }
             }
         }
+    }
+}
+
+// MARK: - Component Views
+private var loadingView: some View {
+    VStack(spacing: 16) {
+        ProgressView().scaleEffect(1.5)
+        Text("Loading account details...")
+            .font(.headline)
+            .foregroundColor(.secondary)
+    }
+}
+
+@ViewBuilder
+private var errorView: some View {
+    if let error = viewModel.errorMessage {
+        VStack(spacing: 20) {
+            Image(systemName: "exclamationmark.triangle")
+                .font(.system(size: 50))
+                .foregroundColor(.orange)
+            
+            Text("Oops! Something went wrong")
+                .font(.headline)
+            
+            Text(error)
+                .font(.body)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+            
+            Button("Try Again") {
+                didLoad = false
+                Task {
+                    await viewModel.fetchAccountDetail(accountId: account.id, baseAccount: account)
+                    didLoad = true
+                }
+            }
+            .buttonStyle(.borderedProminent)
+        }
+        .padding()
     }
 }
 

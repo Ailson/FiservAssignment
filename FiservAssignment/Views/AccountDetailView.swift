@@ -11,7 +11,6 @@ struct AccountDetailView: View {
     let account: Account
     @StateObject private var viewModel = AccountDetailViewModel()
     @EnvironmentObject private var accountsViewModel: AccountsViewModel
-    @State private var didLoad = false
     
     var body: some View {
         ZStack {
@@ -36,22 +35,10 @@ struct AccountDetailView: View {
                 }
             }
         }
-        .alert("Error", isPresented: .constant(viewModel.paginationError != nil)) {
-                    Button("OK") {
-                        viewModel.dismissPaginationError()
-                    }
-                } message: {
-                    Text(viewModel.paginationError ?? "")
-                }
         .onAppear {
-            print("🎬 AccountDetailView.onAppear - accountId: \(account.id), didLoad: \(didLoad)")
-            if !didLoad {
-                didLoad = true
-                print("🌐 Starting fetchAccountDetail...")
-                Task {
-                    await viewModel.fetchAccountDetail(accountId: account.id, baseAccount: account)
-                }
-            }
+            print("🎬 AccountDetailView.onAppear - accountId: \(account.id)")
+            print("🌐 Starting fetchAccountDetail...")
+            Task { await viewModel.fetchAccountDetail(accountId: account.id, baseAccount: account) }
         }
     }
     
@@ -81,11 +68,7 @@ struct AccountDetailView: View {
                 .padding(.horizontal)
             
             Button("Try Again") {
-                didLoad = false
-                Task {
-                    await viewModel.fetchAccountDetail(accountId: account.id, baseAccount: account)
-                    didLoad = true
-                }
+                Task { await viewModel.fetchAccountDetail(accountId: account.id, baseAccount: account) }
             }
             .buttonStyle(.borderedProminent)
         }

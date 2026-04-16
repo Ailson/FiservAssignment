@@ -119,7 +119,6 @@ struct AccountDetailHeaderView_Previews: PreviewProvider {
     }
 }
 
-// Preview sem beneficiários
 struct AccountDetailHeaderView_NoBeneficiaries_Previews: PreviewProvider {
     static var previews: some View {
         let detail = AccountDetail(
@@ -146,7 +145,6 @@ struct AccountDetailHeaderView_NoBeneficiaries_Previews: PreviewProvider {
     }
 }
 
-// Preview com dados mínimos (campos opcionais nil)
 struct AccountDetailHeaderView_MinimalData_Previews: PreviewProvider {
     static var previews: some View {
         let detail = AccountDetail(
@@ -173,7 +171,6 @@ struct AccountDetailHeaderView_MinimalData_Previews: PreviewProvider {
     }
 }
 
-// Preview com saldo negativo
 struct AccountDetailHeaderView_NegativeBalance_Previews: PreviewProvider {
     static var previews: some View {
         let detail = AccountDetail(
@@ -200,7 +197,6 @@ struct AccountDetailHeaderView_NegativeBalance_Previews: PreviewProvider {
     }
 }
 
-// Preview Dark Mode
 struct AccountDetailHeaderView_DarkMode_Previews: PreviewProvider {
     static var previews: some View {
         let detail = AccountDetail(

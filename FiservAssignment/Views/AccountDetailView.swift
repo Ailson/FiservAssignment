@@ -14,7 +14,15 @@ struct AccountDetailView: View {
     @State private var didLoad = false
     
     var body: some View {
-        contentView
+        ZStack {
+            if viewModel.isLoading {
+                loadingView
+            } else if let error = viewModel.errorMessage {
+                errorView(error: error)
+            } else if let detail = viewModel.accountDetail {
+                detailView(detail: detail)
+            }
+        }
         .navigationTitle("Account Details")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -24,17 +32,17 @@ struct AccountDetailView: View {
                 } label: {
                     Image(systemName: accountsViewModel.favoriteIds.contains(account.id)
                           ? "star.fill" : "star")
-                    .foregroundColor(.yellow)
+                        .foregroundColor(.yellow)
                 }
             }
         }
         .alert("Error", isPresented: .constant(viewModel.paginationError != nil)) {
-            Button("OK") {
-                viewModel.dismissPaginationError()
-            }
-        } message: {
-            Text(viewModel.paginationError ?? "")
-        }
+                    Button("OK") {
+                        viewModel.dismissPaginationError()
+                    }
+                } message: {
+                    Text(viewModel.paginationError ?? "")
+                }
         .onAppear {
             print("🎬 AccountDetailView.onAppear - accountId: \(account.id), didLoad: \(didLoad)")
             if !didLoad {
@@ -47,81 +55,64 @@ struct AccountDetailView: View {
         }
     }
     
-    // MARK: - Component Views
-    @ViewBuilder
-    private var contentView: some View {
-        if viewModel.isLoading {
-            loadingView
-        } else if let error = viewModel.errorMessage {
-            errorView
-        } else if let detail = viewModel.accountDetail {
-            detailView
-        }
-    }
-    
     private var loadingView: some View {
         VStack(spacing: 16) {
-            ProgressView().scaleEffect(1.5)
+            ProgressView()
+                .scaleEffect(1.5)
             Text("Loading account details...")
                 .font(.headline)
                 .foregroundColor(.secondary)
         }
     }
     
-    @ViewBuilder
-    private var errorView: some View {
-        if let error = viewModel.errorMessage {
-            VStack(spacing: 20) {
-                Image(systemName: "exclamationmark.triangle")
-                    .font(.system(size: 50))
-                    .foregroundColor(.orange)
-                
-                Text("Oops! Something went wrong")
-                    .font(.headline)
-                
-                Text(error)
-                    .font(.body)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
-                
-                Button("Try Again") {
-                    didLoad = false
-                    Task {
-                        await viewModel.fetchAccountDetail(accountId: account.id, baseAccount: account)
-                        didLoad = true
-                    }
+    private func errorView(error: String) -> some View {
+        VStack(spacing: 20) {
+            Image(systemName: "exclamationmark.triangle")
+                .font(.system(size: 50))
+                .foregroundColor(.orange)
+            
+            Text("Oops! Something went wrong")
+                .font(.headline)
+            
+            Text(error)
+                .font(.body)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+            
+            Button("Try Again") {
+                didLoad = false
+                Task {
+                    await viewModel.fetchAccountDetail(accountId: account.id, baseAccount: account)
+                    didLoad = true
                 }
-                .buttonStyle(.borderedProminent)
             }
-            .padding()
+            .buttonStyle(.borderedProminent)
         }
+        .padding()
     }
     
-    @ViewBuilder
-    private var detailView: some View {
-        if let detail = viewModel.accountDetail {
-            ScrollView {
-                VStack(spacing: 16) {
-                    AccountDetailHeaderView(
-                        detail: detail,
-                        isFavorite: accountsViewModel.favoriteIds.contains(account.id)
-                    )
-                    
-                    TransactionsListView(
-                        transactions: viewModel.transactions,
-                        onLoadMore: {
-                            Task {
-                                await viewModel.loadMoreTransactions(accountId: account.id)
-                            }
-                        },
-                        isLoadingMore: viewModel.isLoadingMore
-                    )
-                }
-                .padding(.vertical)
+    private func detailView(detail: AccountDetail) -> some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                AccountDetailHeaderView(
+                    detail: detail,
+                    isFavorite: accountsViewModel.favoriteIds.contains(account.id)
+                )
+                
+                TransactionsListView(
+                    transactions: viewModel.transactions,
+                    onLoadMore: {
+                        Task {
+                            await viewModel.loadMoreTransactions(accountId: account.id)
+                        }
+                    },
+                    isLoadingMore: viewModel.isLoadingMore
+                )
             }
-            .background(Color(.systemGroupedBackground))
+            .padding(.vertical)
         }
+        .background(Color(.systemGroupedBackground))
     }
 }
 

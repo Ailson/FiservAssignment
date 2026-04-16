@@ -114,10 +114,10 @@ class APIService {
     
     func fetchTransactions(
         accountId: String,
-        nextPage: Int = 1,
+        nextPage: Int = 0,
         fromDate: String? = nil,
         toDate: String? = nil
-    ) async throws -> [Transaction] {
+    ) async throws -> TransactionsResponse {
         guard var request = createRequest(
             endpoint: "/account/transactions/\(accountId)",
             method: "POST"
@@ -165,7 +165,7 @@ class APIService {
             decoder.dateDecodingStrategy = .iso8601
             
             let responseData = try decoder.decode(TransactionsResponse.self, from: data)
-            return responseData.transactions ?? []
+            return responseData
         } catch let error as APIError {
             throw error
         } catch {

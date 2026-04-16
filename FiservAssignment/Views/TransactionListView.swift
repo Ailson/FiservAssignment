@@ -38,7 +38,7 @@ struct TransactionsListView: View {
                 .padding(.vertical, 40)
             } else {
                 LazyVStack(spacing: 0) {
-                    ForEach(Array(transactions.enumerated()), id: \.element.id) { index, transaction in
+                    ForEach(Array(transactions.enumerated()), id: \.offset) { index, transaction in
                         TransactionRowView(transaction: transaction)
                             .onAppear {
                                 if index == transactions.count - 3 {

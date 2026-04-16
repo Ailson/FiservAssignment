@@ -59,6 +59,17 @@ enum TransactionType {
 
 struct TransactionsResponse: Codable {
     let transactions: [Transaction]?
-    let totalCount: Int?
-    let nextPage: Int?
+    let paging: Paging
+}
+
+struct Paging: Codable {
+    let pagesCount: Int
+    let totalItems: Int
+    let currentPage: Int
+    
+    enum CodingKeys: String, CodingKey {
+        case pagesCount = "pages_count"
+        case totalItems = "total_items"
+        case currentPage = "current_page"
+    }
 }

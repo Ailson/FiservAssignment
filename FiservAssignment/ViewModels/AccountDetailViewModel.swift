@@ -17,7 +17,7 @@ class AccountDetailViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var paginationError: String?
     
-    private var nextPage = 1
+    private var nextPage = 0
     private var hasMorePages = true
     private var hasLoaded = false
     
@@ -56,15 +56,13 @@ class AccountDetailViewModel: ObservableObject {
             
             print("✅ Combined AccountDetail created")
             
-            print("📍 Fetching transactions...")
-            transactions = try await apiService.fetchTransactions(
-                accountId: accountId,
-                nextPage: nextPage
-            )
+            print("🔄 Fetching transactions...")
+            let transactionsResponse = try await apiService.fetchTransactions(accountId: accountId, nextPage: nextPage)
+            transactions = transactionsResponse.transactions ?? []
             print("✅ Transactions received: \(transactions.count)")
             
             nextPage += 1
-            hasMorePages = !transactions.isEmpty
+            hasMorePages = nextPage < transactionsResponse.paging.pagesCount
             hasLoaded = true
             
         } catch let error as APIError {
@@ -84,27 +82,29 @@ class AccountDetailViewModel: ObservableObject {
     }
     
     func loadMoreTransactions(accountId: String) async {
-        guard !isLoadingMore && hasMorePages else { return }
+        guard !isLoadingMore && hasMorePages else {
+            print("📍 No more transactions")
+            return
+        }
         
         print("📍 Loading more transactions - page \(nextPage)")
         isLoadingMore = true
         paginationError = nil
         
         do {
-            let newTransactions = try await apiService.fetchTransactions(
-                accountId: accountId,
-                nextPage: nextPage
-            )
-            
-            if newTransactions.isEmpty {
-                hasMorePages = false
-                print("📍 No more transactions")
-            } else {
+            let transactionsResponse = try await apiService.fetchTransactions(accountId: accountId, nextPage: nextPage)
+            if let newTransactions = transactionsResponse.transactions {
                 transactions.append(contentsOf: newTransactions)
-                nextPage += 1
                 print("✅ +\(newTransactions.count) transactions loaded")
+                nextPage += 1
             }
             
+            if nextPage < transactionsResponse.paging.pagesCount {
+                hasMorePages = true
+            } else {
+                hasMorePages = false
+                print("📍 No more transactions")
+            }
         } catch {
             print("❌ Error loading more: \(error)")
             hasMorePages = false

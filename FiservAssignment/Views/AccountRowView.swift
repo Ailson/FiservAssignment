@@ -12,15 +12,13 @@ struct AccountRowView: View {
     
     var body: some View {
         HStack(spacing: 12) {
-            ZStack {
-                Circle()
-                    .fill(accountTypeColor.opacity(0.2))
-                    .frame(width: 44, height: 44)
-                
-                Image(systemName: accountTypeIcon)
-                    .foregroundColor(accountTypeColor)
-                    .font(.system(size: 20))
-            }
+            Image(systemName: accountTypeIcon)
+               .foregroundColor(accountTypeColor)
+               .font(.system(size: 20))
+               .frame(width: 44, height: 44)
+               .background(
+                    Circle()
+                        .fill(accountTypeColor.opacity(0.2)))
             
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 4) {

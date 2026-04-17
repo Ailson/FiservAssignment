@@ -25,7 +25,7 @@ struct AccountDetailView: View {
         .navigationTitle("Account Details")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
+            ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     accountsViewModel.toggleFavorite(accountId: account.id)
                 } label: {
@@ -82,7 +82,7 @@ struct AccountDetailView: View {
                     detail: detail,
                     isFavorite: accountsViewModel.favoriteIds.contains(account.id)
                 )
-                
+
                 TransactionsListView(
                     transactions: viewModel.transactions,
                     onLoadMore: {
